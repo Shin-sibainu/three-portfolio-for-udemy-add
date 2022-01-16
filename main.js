@@ -21,15 +21,13 @@ const sizes = {
 const scene = new THREE.Scene();
 
 //Camera
-
-// Base camera
 const camera = new THREE.PerspectiveCamera(
-  35,
+  75,
   sizes.width / sizes.height,
   0.1,
   100
 );
-camera.position.z = 60;
+camera.position.z = 30;
 
 /**
  * Renderer
@@ -45,11 +43,67 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  */
 const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
 const material = new THREE.MeshStandardMaterial({
-  color: 0xff6347,
+  color: "#87cefa",
 });
 const torus = new THREE.Mesh(geometry, material);
 
 scene.add(torus);
+
+//パーティクル
+const count = 6000;
+const particleGeometry = new THREE.BufferGeometry();
+const positionArray = new Float32Array(count * 3);
+
+for (let i = 0; i < count * 3; i++) {
+  positionArray[i] = (Math.random() - 0.5) * 150;
+}
+
+particleGeometry.setAttribute(
+  "position",
+  new THREE.BufferAttribute(positionArray, 3)
+);
+
+//マテリアル
+const particleMaterial = new THREE.PointsMaterial({
+  size: 0.2,
+});
+
+//メッシュ
+const particle = new THREE.Points(particleGeometry, particleMaterial);
+
+scene.add(particle);
+
+//red sphere
+const redSphereTexture = new THREE.TextureLoader().load(
+  "textures/basecolor.jpg"
+);
+const normalTexture = new THREE.TextureLoader().load("textures/normal.jpg");
+
+const roughnessTexture = new THREE.TextureLoader().load("textures/normal.jpg");
+
+const ambientTexture = new THREE.TextureLoader().load(
+  "textures/ambientOcclusion.jpg"
+);
+
+const redSphere = new THREE.Mesh(
+  new THREE.SphereGeometry(7, 32, 32),
+  new THREE.MeshStandardMaterial({
+    map: redSphereTexture,
+    normalMap: normalTexture,
+    roughnessMap: roughnessTexture,
+    metalness: 0.2,
+    roughness: 0.5,
+    lightMap: ambientTexture,
+    lightMapIntensity: 0.7,
+  })
+);
+
+scene.add(redSphere);
+
+//背景用のテクスチャ
+const textureLoader = new THREE.TextureLoader();
+const bgTexture = textureLoader.load("images/bg3.jpg");
+scene.background = bgTexture;
 
 /**
  * ライト
@@ -62,7 +116,7 @@ scene.add(pointLight, ambientLight);
 
 const lightHelper = new THREE.PointLightHelper(pointLight);
 const gridHelper = new THREE.GridHelper(200, 50);
-scene.add(lightHelper, gridHelper);
+scene.add(lightHelper);
 
 /**
  * カメラ制御
