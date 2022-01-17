@@ -98,7 +98,26 @@ const redSphere = new THREE.Mesh(
   })
 );
 
+redSphere.position.set(-10, 0, 25);
 scene.add(redSphere);
+
+/* カメラ制御 */
+function moveCamera() {
+  const t = document.body.getBoundingClientRect().top;
+  if (t > 0) {
+    return;
+  }
+
+  redSphere.rotation.x += 0.05;
+  redSphere.rotation.y += 0.075;
+  redSphere.rotation.z += 0.05;
+
+  camera.position.z = t * -0.01;
+  camera.position.x = t * -0.0002;
+  camera.rotation.y = t * -0.0002;
+}
+
+document.body.onscroll = moveCamera;
 
 //背景用のテクスチャ
 const textureLoader = new THREE.TextureLoader();
